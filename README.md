@@ -4,6 +4,12 @@ This is the source code accompanying the pre-print:
 
 Gregor Ehrensperger, Tobias Hell, Georg J. Mayr, and Thorsten Simon (2022). Identifying Lightning Processes in ERA5 Soundings with Deep Learning. Available on arXiv, 2210.11529. DOI: [10.48550/ARXIV.2210.11529](https://doi.org/10.48550/arXiv.2210.11529)
 
+## Citing this software
+[Citation information](CITATION.cff)
+
+[![DOI](https://zenodo.org/badge/550170268.svg)](https://zenodo.org/badge/latestdoi/550170268)
+
+
 ## Setup (Ubuntu)
 ### Conda
 Use conda to install all required modules (default environment: `meteorology_verticallearning`):\
