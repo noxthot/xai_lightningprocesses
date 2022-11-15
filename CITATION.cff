@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Ehrensperger"
+  given-names: "Gregor"
+  orcid: "https://orcid.org/0000-0003-4816-0233"
+- family-names: "Hell"
+  given-names: "Tobias"
+  orcid: "https://orcid.org/0000-0002-2841-3670"
+- family-names: "Mayr"
+  given-names: "Georg"
+  orcid: "https://orcid.org/0000-0001-6661-9453"
+- family-names: "Simon"
+  given-names: "Thorsten"
+  orcid: "https://orcid.org/0000-0002-3778-7738"
+title: "xai_lightningprocesses"
+version: 1.0.0
+doi: tbc
+date-released: 2022-11-15
+url: "https://github.com/noxthot/xai_lightningprocesses"
