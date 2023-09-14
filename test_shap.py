@@ -4,6 +4,7 @@ import os
 import shap
 import torch
 
+import numpy as np
 import pandas as pd
 import torch.nn as nn
 
@@ -71,6 +72,7 @@ for hour in HOUR_RNG:
     testdf_filt_h = testdf.filter((testdf["hour"] == int(hour)))
 
     return_dfs = []
+    return_basevalues = []
 
     print(f"Filter test dataframe by hour {hour}", flush=True)    
     converter = make_spark_converter(testdf_filt_h)
@@ -116,12 +118,15 @@ for hour in HOUR_RNG:
 
             print(f"Compute shapley values for lon {lon}, lat {lat}, hour {hour}")
             e = shap.DeepExplainer(model, background)
+            base_value = e.expected_value
+            print(f"Base value: {base_value}")
             shap_values = e.shap_values(data_filt_lat)
-            
-            shap_df = pd.DataFrame(shap_values, columns=[utils_shap.colname_shap_infix(col) for col in ccc.TRAIN_COLS])
+
+            shap_df = pd.DataFrame(np.append(shap_values, np.full((np.shape(shap_values)[0], 1), base_value), axis=1), columns=[utils_shap.colname_shap_infix(col) for col in ccc.TRAIN_COLS] + ["shap_base_value"])
             shap_df = pd.concat([shap_df, meta_filt_lat], axis=1)
             return_dfs.append(shap_df)
-            
+            return_basevalues.append(base_value)
+
     print("Export results", flush=True)
     return_df = pd.concat(return_dfs, ignore_index=True)
     return_df = utils.joinDataframes(return_df, fitdf, True)
