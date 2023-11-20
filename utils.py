@@ -44,15 +44,17 @@ class Classifier(nn.Module):
 
         self.hidden_layers = nn.ModuleList([nn.Linear(input_dim, hidden_layers[0])])
         self.hidden_layers.extend([nn.Linear(hidden_layers[idx - 1], hidden_layers[idx]) for idx in range(1, len(hidden_layers))])
-        
+        self.dropout_layers = nn.ModuleList([nn.Dropout(dropout_p) for _ in range(len(hidden_layers))])
+
         self.outputlayer = nn.Linear(hidden_layers[-1], output_dim)
 
-        self.dropout = nn.Dropout(dropout_p)
+        self.act_functions = nn.ModuleList([nn.LeakyReLU() for _ in range(len(hidden_layers))])
 
     def forward(self, x):
-        for hlayer in self.hidden_layers:
-            x = F.leaky_relu(hlayer(x))
-            x = self.dropout(x)
+        for hlayer, act_fun, dlayer in zip(self.hidden_layers, self.act_functions, self.dropout_layers):
+            x = hlayer(x)
+            x = act_fun(x)
+            x = dlayer(x)
 
         x = self.outputlayer(x)
 
