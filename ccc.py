@@ -11,7 +11,7 @@ BATCH_SIZE = 1024
 
 SEED_RANDOM = 1337  # Set to None to disable
 
-DATA_ROOT_PATH = os.path.join('.', 'data', 'data_processed')
+DATA_ROOT_PATH = os.path.join('.', 'data_processed_archived')
 MODEL_ROOT_PATH = os.path.join('.', 'data', 'models')
 DATASTATS_PATH = os.path.join(".", "data", "data_stats")
 CACHE_PATH = os.path.join(".", "data", "cache")
