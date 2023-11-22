@@ -76,10 +76,9 @@ for hour in HOUR_RNG:
     converter = make_spark_converter(testdf_filt_h)
     
     norm_fun = utils.getnormfun(config_model["norm_fun"])
-    posweight = utils.calc_pos_weights(config_model['target_mode'], device)
-    
-    batch_size = len(converter) 
-    
+
+    batch_size = len(converter)
+
     print(f"Get meta and data ({batch_size} rows)", flush=True)
     with converter.make_torch_dataloader(batch_size=batch_size, transform_spec=utils.get_transform_spec(
                                             norm_fun, config_model['target_mode'],
