@@ -11,23 +11,28 @@ Gregor Ehrensperger, Tobias Hell, Georg J. Mayr, and Thorsten Simon (2022). Iden
 
 
 ## Setup (Ubuntu)
-### Conda
-Use conda to install all required modules (default environment: `meteorology_verticallearning`):\
-```
-conda env create -f environment.yml
+### Paths
+Processed data is found in `Seafile/mlvapto/`. Simply create a symbolic link to that directory and name the link `data`. Raw data needs to be put into `data_raw_aut` (Austria) and `data_raw_eu` (EU).
+
+### Python
+#### PDM
+Use `pdm` to install/sync all required modules:
+```bash
+pdm sync
 ```
 
-Attention: Using the environment requires a CUDA-enabled graphics card (basically any Nvidia graphics card). Otherwise you might want to install the required packages manually.
+To run code / `IPython` / `jupyter lab` in this environment:
+```bash
+pdm run python <SCRIPT.py>
 
-In case you already got the environment and only need to update to the latest `environment.yml` use:\
-```
-conda activate meteorology_verticallearning
-conda env update --file environment.yml --prune
+pdm run ipython
+
+pdm run jupyter lab
 ```
 
-After manually adding a package, update the `environment.yml` using this command:\
-```
-conda env export --name meteorology_verticallearning > environment.yml
+To add a package:
+```bash
+pdm add <PACKAGE_NAME>
 ```
 
 ### Java
