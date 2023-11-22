@@ -15,6 +15,7 @@ import utils_ui
 from petastorm.spark import make_spark_converter
 
 NR_ROWS_USED_TEST = None  # Limits the input data to this number of rows. Set to None to use full dataset
+USE_NO_FLASH_AS_BACKGROUND = True
 
 LON_RNG = utils.getVarRange('longitude')
 LAT_RNG = utils.getVarRange('latitude')
@@ -34,7 +35,8 @@ with open(os.path.join(modelpath, 'train_monitor.pickle'), 'rb') as f:
 _, best_epoch = utils.getOptThresholdFromVal(train_monitor)
 
 model, model_name = utils.load_model(modeldir, device, best_epoch)
-shap_path = os.path.join(modelpath, f"{model_name}_shap_parquet")
+no_flash_postfix = "_bg_no_flash" if USE_NO_FLASH_AS_BACKGROUND else ""
+shap_path = os.path.join(modelpath, f"{model_name}_shap_parquet{no_flash_postfix}")
 
 if not os.path.isdir(shap_path):
     os.makedirs(shap_path)
@@ -107,8 +109,13 @@ for hour in HOUR_RNG:
             meta_filt_lat.reset_index(drop=True, inplace=True)
             data_filt_lat = data_filt_lon[idx_filt_lat,]
 
+            if USE_NO_FLASH_AS_BACKGROUND:
+                meta_filt_lat_no_flashes = meta_filt_lat.query(f"{utils_shap.colname_meta_infix('flash')} == 0")
+                background = data_filt_lat[meta_filt_lat_no_flashes.index,]
+            else:
+                background = data_filt_lat
+
             print(f"Compute shapley values for lon {lon}, lat {lat}, hour {hour}")
-            background = data_filt_lat
             e = shap.DeepExplainer(model, background)
             shap_values = e.shap_values(data_filt_lat)
             
