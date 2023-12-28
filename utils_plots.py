@@ -247,6 +247,7 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
 
             with open(cache_filepath_cloud, 'wb') as handle:
                 pickle.dump(dd_profiles, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
         postfix = "_cloudscaled"
     elif y_axis == "geopotential_altitude":
         df_lvldefs = pd.read_csv(os.path.join("data", "netcdf_raw", "era5_model_level_definitions.csv"))
