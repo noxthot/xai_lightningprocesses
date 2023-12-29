@@ -7,26 +7,30 @@ authors = [
 ]
 dependencies = [
     "numpy>=1.25.2",
-    "shap>=0.43.0",
-    "torch>=2.1.0",
-    "datetime>=5.2",
-    "dask>=2023.9.3",
-    "pandas>=2.1.0",
-    "xarray>=2023.9.0",
-    "scikit-learn>=1.3.1",
+    "shap>=0.44.0",
+    "torch>=2.1.2",
+    "datetime>=5.4",
+    "dask>=2023.12.1",
+    "pandas>=2.1.4",
+    "xarray>=2023.12.0",
+    "scikit-learn>=1.3.2",
     "pyspark>=3.5.0",
-    "imageio>=2.31.5",
+    "imageio>=2.33.1",
     "cartopy>=0.22.0",
-    "matplotlib>=3.8.0",
+    "matplotlib>=3.7.4",
     "seaborn>=0.13.0",
     "petastorm>=0.12.1",
-    "inquirer>=3.1.3",
-    "jupyterlab>=4.0.6",
-    "ipython>=8.16.1",
-    "gitpython>=3.1.37",
+    "inquirer>=3.1.4",
+    "jupyterlab>=4.0.9",
+    "ipython>=8.19.0",
+    "gitpython>=3.1.40",
     "ipywidgets>=8.1.1",
+    "basemap>=1.3.9",
+    "basemap-data-hires>=1.3.2",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 readme = "README.md"
 license = {text = "MIT"}
 
+[tool.setuptools]
+py-modules = []
