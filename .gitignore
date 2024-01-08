@@ -116,3 +116,4 @@ pub/2022_05_JAMES/build
 
 .pdm-python
 data_processed_archived
+mlvapto.egg-info
