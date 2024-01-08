@@ -25,7 +25,6 @@ CLUSTER_COLORS = [
 
 COLUMN_UNITS = {
     "level" : "",
-    "cloudscale_intpol" : "",
     "geopotential_altitude" : "m",
     'ciwc': "kg/kg",
     'cswc': "kg/kg",
@@ -74,7 +73,7 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     else:
         raise Exception(f"{target_var} unknown")
 
-    ylims = [0, 1] if y_axis == "cloudscale_intpol" else [min(dd_profiles_agg[y_axis]), max(dd_profiles_agg[y_axis])]
+    ylims = [min(dd_profiles_agg[y_axis]), max(dd_profiles_agg[y_axis])]
 
     dd_profiles_agg_q = dd_profiles_agg.query(f"cluster == {clusternr}") if clusternr != "" else dd_profiles_agg
 
@@ -151,21 +150,19 @@ def plot_many_profiles_internal_mult(dd_profiles, target_var, y_axis, palette, p
 """
 Aggregated plots
 ptype = q50, q90, mult
-x_axis = level, cloudscale_intpol, geopotential_altitude
+x_axis = level, geopotential_altitude
 """
-def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', separate_clusters=False, save_path="", use_cache=True, plot_clusters=dict(), only_show_cols=[]):
+def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', separate_clusters=False, save_path="", use_cache=True, plot_clusters=dict(), only_show_cols=[], write_cache=True):
     if ptype not in ['q50', 'q90', 'mult']:
         raise Exception(f"ptype {ptype} unknown")
 
-    if y_axis not in ['level', 'cloudscale_intpol', 'geopotential_altitude']:
+    if y_axis not in ['level', 'geopotential_altitude']:
         raise Exception(f"y_axis {y_axis} unknown")
 
     sns.set_theme(style="whitegrid", font_scale=1.5)
     
     cache_filename = "cached_profiles.pickle"
-    cache_filename_cloud = "cached_profiles_clouds.pickle"
     cache_filepath = os.path.join(save_path, cache_filename)
-    cache_filepath_cloud = os.path.join(save_path, cache_filename_cloud)
 
     if use_cache and os.path.isfile(cache_filepath):
         print(f"Using cached file {cache_filepath}")
@@ -174,10 +171,10 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
         mycases = df_many_cases.copy()
         mycases.drop([c for c in mycases.columns if c.startswith("geoh")], axis="columns", inplace=True)
 
-        idxcols = list(set(utils_shap.META_COLS_NOLVL + ["cth", "cbh"]) - set(["flash"]))
+        idxcols = list(set(utils_shap.META_COLS_NOLVL) - set(["flash"]))
 
         mycases_wl = pd.wide_to_long(mycases,
-                                stubnames=[f"{c}{infix}_lvl" for c in ccc.LVL_TRAIN_COLS for infix in {utils_shap.META_INFIX, utils_shap.SHAP_INFIX}] + ["cloudscale_lvl"],
+                                stubnames=[f"{c}{infix}_lvl" for c in ccc.LVL_TRAIN_COLS for infix in {utils_shap.META_INFIX, utils_shap.SHAP_INFIX}],
                                 i=idxcols,
                                 j='level',
                                 sep='')
@@ -190,66 +187,13 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
         mycases_wl.rename(columns=rencols, inplace=True)
         mycases_wl.rename(lambda c: "_".join(c.split("_")[::-1]), axis='columns', inplace=True)  # wide_to_long needs suffixes; so we rename columns "foo_bar" to "bar_foo"
        
-        dd_profiles = pd.wide_to_long(mycases_wl, [utils_shap.META_INFIX[1:], utils_shap.SHAP_INFIX[1:]], ccc.INDEX_COLS + ['level', "cbh", "cth", "cloudscale"], "variable", "_", r"\w+")
+        dd_profiles = pd.wide_to_long(mycases_wl, [utils_shap.META_INFIX[1:], utils_shap.SHAP_INFIX[1:]], ccc.INDEX_COLS + ['level'], "variable", "_", r"\w+")
 
-        with open(cache_filepath, 'wb') as handle:
-            pickle.dump(dd_profiles, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    if y_axis == "cloudscale_intpol":
-        if use_cache and os.path.isfile(cache_filepath_cloud):
-            print(f"Using cached file {cache_filepath_cloud}")
-            dd_profiles = pd.read_pickle(cache_filepath_cloud)
-        else:
-            dd_profiles_cs = dd_profiles.reset_index()
-            dd_profiles_cs = dd_profiles_cs[dd_profiles_cs["cloudscale"].notna()]
-
-            dd_profiles_cs_grouped = dd_profiles_cs.groupby(ccc.INDEX_COLS)
-
-            dd_cloudscaled_profiles = []
-            nr_groups = len(dd_profiles_cs_grouped)
-
-            print(f"Parsing {nr_groups} groups", flush=True)
-
-            for idx, data in enumerate(dd_profiles_cs_grouped):
-                if idx % 100 == 1:
-                    print(f"{idx + 1} / {nr_groups}", flush=True)
-
-                _, group = data
-                cloudscale_new = np.arange(0, 1, 0.01)
-
-                for var in ccc.LVL_TRAIN_COLS:
-                    onegroup = group.query(f"variable == '{var}'").sort_values("cloudscale")
-
-                    if len(onegroup) < 2:
-                        print("Skipped group due to lack of data", flush=True)
-                        break
-
-                    dd_cloudscaled_profile = pd.DataFrame({"cloudscale_intpol" : cloudscale_new, "variable" : var})
-
-                    for vartype in ["meta", "shapval"]:
-                        x = onegroup["cloudscale"]
-                        y = onegroup[vartype]
-                        f = interpolate.interp1d(x, y, assume_sorted=True, bounds_error=False, fill_value=(y.iloc[0], y.iloc[-1]))
-
-                        ynew = f(cloudscale_new)
-                        dd_cloudscaled_profile[vartype] = ynew
-
-                    for col in ccc.INDEX_COLS + ["cbh", "cth", "cluster"]:
-                        dd_cloudscaled_profile[col] = group[col].iloc[0]
-
-                    dd_cloudscaled_profiles.append(dd_cloudscaled_profile)
-
-            print("Concatenating", flush=True)
-            dd_profiles = pd.concat(dd_cloudscaled_profiles)
-
-            print("Resetting index", flush=True)
-            dd_profiles = dd_profiles.set_index(ccc.INDEX_COLS + ["cbh", "cth", "cloudscale_intpol", "variable"])
-
-            with open(cache_filepath_cloud, 'wb') as handle:
+        if write_cache:
+            with open(cache_filepath, 'wb') as handle:
                 pickle.dump(dd_profiles, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        postfix = "_cloudscaled"
-    elif y_axis == "geopotential_altitude":
+    if y_axis == "geopotential_altitude":
         df_lvldefs = pd.read_csv(os.path.join("data", "netcdf_raw", "era5_model_level_definitions.csv"))
         df_lvldefs = df_lvldefs[["n", "geopotential_altitude"]]
         df_lvldefs["geopotential_altitude"] = df_lvldefs["geopotential_altitude"].round().astype(np.int32)
@@ -263,6 +207,7 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
 
     postfix += "_cl" + "-".join([str(c) for c in plot_clusters.keys()]) if len(plot_clusters) > 0 else ""
     postfix += "_" + "-".join(only_show_cols) if len(only_show_cols) > 0 else ""
+    postfix += "" if write_cache else "_experimental"
 
     q05 = lambda x : x.quantile(0.05)
     q25 = lambda x : x.quantile(0.25)
