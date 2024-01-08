@@ -64,12 +64,12 @@ def formatManyProfilesPlots(g, target_var, y_axis, clusternr):
 
 
 def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette, plot_clusters, clusternr="", save_filepath=""):
-    sharex = True
-
     if target_var == "shap":        
         colprefix = "shapval_"
+        sharex = True
     elif target_var == "feature":
         colprefix = "meta_"
+        sharex = False
     else:
         raise Exception(f"{target_var} unknown")
 
