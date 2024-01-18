@@ -81,8 +81,8 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     hue_order = list(plot_clusters.keys()) if "cluster" in dd_profiles_agg_q.columns else None
 
     legend_keys = plot_clusters if clusternr == "" else [int(clusternr)]
-    legend_elements = [Patch(color=CLUSTER_COLORS[key], label=plot_clusters[key]) for key in legend_keys]
-
+    legend_elements = [Patch(color=(plt.colormaps[palette](idx) if isinstance(palette, str) else CLUSTER_COLORS[key]), label=plot_clusters[key]) for idx, key in enumerate(legend_keys)]
+    
     dd_profiles_agg_q = dd_profiles_agg_q.sort_values(by=['variable', huecol, y_axis]).reset_index()
 
     g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=0.7, sharex=sharex, sharey=True, palette=palette) 
@@ -128,7 +128,7 @@ def plot_many_profiles_internal_mult(dd_profiles, target_var, y_axis, palette, p
     hue_order = list(plot_clusters.keys()) if "cluster" in dd_profiles_q.columns else None
 
     legend_keys = plot_clusters if clusternr == "" else [int(clusternr)]
-    legend_elements = [Patch(color=CLUSTER_COLORS[key], label=plot_clusters[key]) for key in legend_keys]
+    legend_elements = [Patch(color=(plt.colormaps[palette](idx) if isinstance(palette, str) else CLUSTER_COLORS[key]), label=plot_clusters[key]) for idx, key in enumerate(legend_keys)]
         
     print(f"Sampling {nr_profiles} unique profiles")
     event_ids = dd_profiles['unique_profile'].unique().tolist()
@@ -152,7 +152,7 @@ Aggregated plots
 ptype = q50, q90, mult
 x_axis = level, geopotential_altitude
 """
-def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', separate_clusters=False, save_path="", use_cache=True, plot_clusters=dict(), only_show_cols=[], write_cache=True):
+def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', separate_clusters=False, save_path="", use_cache=True, plot_clusters=dict(), only_show_cols=[], write_cache=True, color_palette=None):
     if ptype not in ['q50', 'q90', 'mult']:
         raise Exception(f"ptype {ptype} unknown")
 
@@ -225,7 +225,10 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
     if len(plot_clusters) > 0:
         dd_profiles = dd_profiles[dd_profiles['cluster'].isin(plot_clusters.keys())]
 
-    palette = sns.color_palette([CLUSTER_COLORS[col] for col in plot_clusters.keys()] if len(plot_clusters) > 0 else CLUSTER_COLORS)
+    if color_palette is not None:
+        palette = color_palette
+    else:
+        palette = sns.color_palette([CLUSTER_COLORS[col] for col in plot_clusters.keys()] if len(plot_clusters) > 0 else CLUSTER_COLORS)
 
     if ptype == "mult":
         print("Grouping unique profiles")
