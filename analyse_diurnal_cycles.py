@@ -5,6 +5,7 @@ import utils_ui
 import utils_subdomains
 
 import json
+import matplotlib
 import os
 import pickle
 import torch
@@ -13,6 +14,10 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+
+
+font = {'size' : 12}
+matplotlib.rc('font', **font)
 
 # %%
 target_mode = utils_ui.ask_targetmode()
