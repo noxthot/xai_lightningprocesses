@@ -14,10 +14,17 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+import ccc
 
 
 font = {'size' : 12}
 matplotlib.rc('font', **font)
+
+
+# %%
+PATH_REFMODEL = os.path.join(ccc.MODEL_ROOT_PATH, 'targetmode_1', '2022_02_22__ALDIS_reference_gam')
+PATH_REFMODEL_TESTDF = os.path.join(PATH_REFMODEL, 'test_predictions.parquet')
+THRESHOLD_REFERENCE = 0.1259768351493519
 
 # %%
 target_mode = utils_ui.ask_targetmode()
@@ -61,10 +68,15 @@ cape_agg = d_cape.groupby(['hour', 'subdomain']).mean()
 # %%
 with open(os.path.join(model_path, f'{model_name}_val_scores.json'), 'r') as f:
     test_scores_json = json.load(f)
-    THRESHOLD = test_scores_json["opt_thr_calibration"]
+    THRESHOLD = test_scores_json["used_threshold"]
+
+#%%
+test_df_ref = pd.read_parquet(PATH_REFMODEL_TESTDF)
+test_df_ref["output_reference"] = (test_df_ref["fit"] > THRESHOLD_REFERENCE) * 1.0
+test_df_ref = test_df_ref[["longitude", "latitude", "output_reference", "hour"]]
 
 # %%
-test_df = test_df.merge(subdomains, how='left', on=['longitude', 'latitude'])
+test_df = test_df.merge(test_df_ref, how="left", on=["longitude", "latitude", "hour"]).merge(subdomains, how='left', on=['longitude', 'latitude'])
 print(f"Using {THRESHOLD} as threshold...", flush=True)
 test_df['output'] = np.where(test_df["output"] > THRESHOLD, 1.0, 0.0)
 test_df.drop(['longitude', 'latitude'], axis=1, inplace=True)
@@ -101,12 +113,12 @@ if SKIP_CAPE is False:
     df_long = pd.concat([df_long, cape_long])
 
 df_long['subdomain'].replace(utils_subdomains.LABELS, inplace=True)
-df_long['type'].replace({'output': 'model', 'target': 'observations'}, inplace=True)
+df_long['type'].replace({'output': 'model', 'output_reference' : 'model_ref', 'target': 'observations'}, inplace=True)
 df_long['value'] *= 100.0
 
 ofile = os.path.join(DIURNAL_CYCLE_PATH, "cycles_paper.png")
-g = sns.FacetGrid(df_long, col="subdomain")
-g.map(sns.lineplot, "hour", "value", "type")
+g = sns.FacetGrid(df_long, col="subdomain", hue_kws={'color': ['#1f78b4', '#b2df8a', '#a6cee3'], "ls" : ["-", "-.", "--"]}, hue="type")
+g.map(sns.lineplot, "hour", "value")
 g.set_titles('{col_name}')
 g.set_ylabels('Occurrence [%]')
 g.add_legend()
