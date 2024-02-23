@@ -26,7 +26,7 @@ model_dir, model_path = utils_ui.ask_modeldir(target_mode)
 with open(os.path.join(model_path, 'train_monitor.pickle'), 'rb') as f:
     train_monitor = pickle.load(f)
     
-_, best_epoch = utils.getOptThresholdFromVal(train_monitor)
+_, best_epoch = utils.getOptThresholdFromVal(train_monitor, use_epoch=18)
 
 _, model_name = utils.load_model(model_dir, torch.device("cpu"), best_epoch)
 
