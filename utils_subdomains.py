@@ -1,8 +1,8 @@
 import numpy as np
-import xarray as xr
+import pandas as pd
 import os
 
-PATH_DATA_SOURCE = os.path.join('.', 'data', 'netcdf_raw')
+PATH_DATA_SOURCE = os.path.join('resources')
 
 LABELS = {
     'FL':  'Flatlands',
@@ -12,9 +12,7 @@ LABELS = {
 }
 
 def get_subdomains():
-    ds = xr.open_dataset(os.path.join(PATH_DATA_SOURCE, 'ERA5_altitude.nc'))
-    df = ds.to_dataframe()
-    df.reset_index(inplace=True)
+    df = pd.read_csv(os.path.join(PATH_DATA_SOURCE, 'era5_altitudes.csv'))
     df['subdomain'] = np.select(
         [
             (df['altitude'] >= 1200),
