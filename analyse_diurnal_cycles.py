@@ -30,6 +30,7 @@ font = {'size' : 12}
 
 matplotlib.rc('font', **font)
 
+EPOCH = 18  # Set to None to use the best epoch
 
 # %%
 PATH_REFMODEL = os.path.join(ccc.MODEL_ROOT_PATH, 'targetmode_1', '2022_02_22__ALDIS_reference_gam')
@@ -44,7 +45,7 @@ model_dir, model_path = utils_ui.ask_modeldir(target_mode)
 with open(os.path.join(model_path, 'train_monitor.pickle'), 'rb') as f:
     train_monitor = pickle.load(f)
     
-_, best_epoch = utils.getOptThresholdFromVal(train_monitor, use_epoch=18)
+_, best_epoch = utils.getOptThresholdFromVal(train_monitor, use_epoch=EPOCH)
 
 _, model_name = utils.load_model(model_dir, torch.device("cpu"), best_epoch)
 
