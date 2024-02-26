@@ -26,6 +26,11 @@ PATH_REFMODEL = os.path.join(ccc.MODEL_ROOT_PATH, 'targetmode_1', '2022_02_22__A
 PATH_REFMODEL_TESTDF = os.path.join(PATH_REFMODEL, 'test_predictions.parquet')
 THRESHOLD_REFERENCE = 0.1259768351493519
 
+font = {'size' : 12}
+
+matplotlib.rc('font', **font)
+
+
 # %%
 target_mode = utils_ui.ask_targetmode()
 model_dir, model_path = utils_ui.ask_modeldir(target_mode)
