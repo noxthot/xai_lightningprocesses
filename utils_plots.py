@@ -85,7 +85,7 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     
     dd_profiles_agg_q = dd_profiles_agg_q.sort_values(by=['variable', huecol, y_axis]).reset_index()
 
-    g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=0.7, sharex=sharex, sharey=True, palette=palette) 
+    g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=1, sharex=sharex, sharey=True, palette=palette) 
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qlow", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qhigh", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}median", lw=3, hue_order=hue_order, estimator=None, err_style=None)
@@ -135,7 +135,7 @@ def plot_many_profiles_internal_mult(dd_profiles, target_var, y_axis, palette, p
     sampled_ids = random.sample(event_ids, nr_profiles)
 
     print("Plotting")
-    g = sns.FacetGrid(dd_profiles_q[dd_profiles_q.unique_profile.isin(sampled_ids)], col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=0.7, sharex=sharex, sharey=True, palette=palette)    
+    g = sns.FacetGrid(dd_profiles_q[dd_profiles_q.unique_profile.isin(sampled_ids)], col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=1, sharex=sharex, sharey=True, palette=palette)    
     g.map_dataframe(sns.lineplot, y=y_axis, x=coltarget, units='unique_profile', hue_order=hue_order, alpha=0.05, estimator=None)
     g.add_legend(handles=legend_elements, loc='center right', bbox_to_anchor=(1, 0.5))
 
@@ -159,7 +159,7 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
     if y_axis not in ['level', 'geopotential_altitude']:
         raise Exception(f"y_axis {y_axis} unknown")
 
-    sns.set_theme(style="whitegrid", font_scale=1.5)
+    sns.set_theme(style="whitegrid", font_scale=2.0)
     
     cache_filename = "cached_profiles.pickle"
     cache_filepath = os.path.join(save_path, cache_filename)
