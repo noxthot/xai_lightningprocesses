@@ -53,7 +53,7 @@ def formatManyProfilesPlots(g, target_var, y_axis, clusternr):
         ax.set_xlabel(xlabel)
 
     ylabel = y_axis + (f" [{COLUMN_UNITS[y_axis]}]" if y_axis in COLUMN_UNITS else "")
-    g.set_ylabels(ylabel)
+    g.set_ylabels(ylabel.replace("_", " "))
 
     g.refline(y=0)
 
