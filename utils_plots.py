@@ -13,15 +13,19 @@ import os
 import utils_shap
 
 from matplotlib.patches import Patch
-from scipy import interpolate
 
-CLUSTER_COLORS = [
-    (0.69803921568627447, 0.87450980392156863, 0.54117647058823526),
-    (0.2,                 0.62745098039215685, 0.17254901960784313),
-    (0.8901960784313725,  0.10196078431372549, 0.10980392156862745),
-    (0.98431372549019602, 0.60392156862745094, 0.6                ),
-    (0.902,               0.902,               1.0                ),
-]
+CLUSTER_COLORS = {
+    'TP less confident': (0.69803921568627447, 0.87450980392156863, 0.54117647058823526),
+    'TP very confident': (0.2,                 0.62745098039215685, 0.17254901960784313),
+    'FN': (0.8901960784313725,  0.10196078431372549, 0.10980392156862745),
+    'FP': (0.98431372549019602, 0.60392156862745094, 0.6                ),
+    'TN': (0.902,               0.902,               1.0                ),
+    'TP_CLOUD_HIGH': (0.12156862745098039, 0.47058823529411764, 0.7058823529411765),
+    'TP_MASS_HIGH': (0.99215686, 0.68235294, 0.38039216),
+    'TP_WIND_HIGH': (0.2       , 0.62745098, 0.17254902),
+    'TP_LC': (0.69803921568627447, 0.87450980392156863, 0.54117647058823526),
+    'TP_VC': (0.2,                 0.62745098039215685, 0.17254901960784313),
+}
 
 COLUMN_UNITS = {
     "level" : "",
@@ -81,7 +85,7 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     hue_order = list(plot_clusters.keys()) if "cluster" in dd_profiles_agg_q.columns else None
 
     legend_keys = plot_clusters if clusternr == "" else [int(clusternr)]
-    legend_elements = [Patch(color=(plt.colormaps[palette](idx) if isinstance(palette, str) else CLUSTER_COLORS[key]), label=plot_clusters[key]) for idx, key in enumerate(legend_keys)]
+    legend_elements = [Patch(color=(plt.colormaps[palette](idx) if isinstance(palette, str) else CLUSTER_COLORS[plot_clusters[key]]), label=plot_clusters[key]) for idx, key in enumerate(legend_keys)]
     
     dd_profiles_agg_q = dd_profiles_agg_q.sort_values(by=['variable', huecol, y_axis]).reset_index()
 
@@ -128,7 +132,7 @@ def plot_many_profiles_internal_mult(dd_profiles, target_var, y_axis, palette, p
     hue_order = list(plot_clusters.keys()) if "cluster" in dd_profiles_q.columns else None
 
     legend_keys = plot_clusters if clusternr == "" else [int(clusternr)]
-    legend_elements = [Patch(color=(plt.colormaps[palette](idx) if isinstance(palette, str) else CLUSTER_COLORS[key]), label=plot_clusters[key]) for idx, key in enumerate(legend_keys)]
+    legend_elements = [Patch(color=(plt.colormaps[palette](idx) if isinstance(palette, str) else CLUSTER_COLORS[plot_clusters[key]]), label=plot_clusters[key]) for idx, key in enumerate(legend_keys)]
         
     print(f"Sampling {nr_profiles} unique profiles")
     event_ids = dd_profiles['unique_profile'].unique().tolist()
@@ -225,10 +229,10 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
     if len(plot_clusters) > 0:
         dd_profiles = dd_profiles[dd_profiles['cluster'].isin(plot_clusters.keys())]
 
-    if color_palette is not None:
-        palette = color_palette
+    if color_palette is None:
+        palette = sns.color_palette([CLUSTER_COLORS[plot_clusters[col]] for col in plot_clusters] if len(plot_clusters) > 0 else CLUSTER_COLORS.values())
     else:
-        palette = sns.color_palette([CLUSTER_COLORS[col] for col in plot_clusters.keys()] if len(plot_clusters) > 0 else CLUSTER_COLORS)
+        palette = color_palette
 
     if ptype == "mult":
         print("Grouping unique profiles")
