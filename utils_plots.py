@@ -42,6 +42,9 @@ COLUMN_UNITS = {
     'topography': "m",
 }
 
+PLOT_ASPECT = 0.9
+PLOT_DPI = 300
+
 
 def formatManyProfilesPlots(g, target_var, y_axis, clusternr):
     for ax in g.axes.ravel():
@@ -89,7 +92,7 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     
     dd_profiles_agg_q = dd_profiles_agg_q.sort_values(by=['variable', huecol, y_axis]).reset_index()
 
-    g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=1, sharex=sharex, sharey=True, palette=palette) 
+    g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=PLOT_ASPECT, sharex=sharex, sharey=True, palette=palette) 
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qlow", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qhigh", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}median", lw=3, hue_order=hue_order, estimator=None, err_style=None)
@@ -105,8 +108,8 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)
 
-        g.savefig(f"{save_filepath}.pdf", dpi=600)
-        g.savefig(f"{save_filepath}.png", dpi=600)
+        g.savefig(f"{save_filepath}.pdf", dpi=PLOT_DPI)
+        g.savefig(f"{save_filepath}.png", dpi=PLOT_DPI)
     else:
         g.fig.show()
 
@@ -139,14 +142,14 @@ def plot_many_profiles_internal_mult(dd_profiles, target_var, y_axis, palette, p
     sampled_ids = random.sample(event_ids, nr_profiles)
 
     print("Plotting")
-    g = sns.FacetGrid(dd_profiles_q[dd_profiles_q.unique_profile.isin(sampled_ids)], col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=1, sharex=sharex, sharey=True, palette=palette)    
+    g = sns.FacetGrid(dd_profiles_q[dd_profiles_q.unique_profile.isin(sampled_ids)], col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=PLOT_ASPECT, sharex=sharex, sharey=True, palette=palette)    
     g.map_dataframe(sns.lineplot, y=y_axis, x=coltarget, units='unique_profile', hue_order=hue_order, alpha=0.05, estimator=None)
     g.add_legend(handles=legend_elements, loc='center right', bbox_to_anchor=(1, 0.5))
 
     formatManyProfilesPlots(g, target_var, y_axis, clusternr)
 
     if save_filepath != "":
-        g.savefig(save_filepath, dpi=600)
+        g.savefig(save_filepath, dpi=PLOT_DPI)
 
     return g
 
