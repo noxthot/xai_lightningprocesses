@@ -170,6 +170,92 @@ def get_activation(name):
     return hook
 
 
+def calc_scores(pred_score, target, threshold, print_output=False):
+    target_has_two_classes = np.min(target.values) < np.max(target.values)
+
+    if target_has_two_classes:
+        roc_auc = scores.roc_auc_score(target, pred_score, multi_class="ovr")
+
+        precisions, recalls, prc_thresholds = scores.precision_recall_curve(target, pred_score)
+        prc_auc = scores.auc(recalls, precisions)
+
+        # Threshold based on F1 score
+        fscores = [(2 * p * r) / (p + r) if (p + r) != 0 else 0 for p, r in zip(precisions, recalls)]
+        opt_threshold_f1score = prc_thresholds[np.argmax(fscores)]
+    else:
+        roc_auc = np.nan
+        prc_auc = np.nan
+        opt_threshold_f1score = 1
+
+    # Threshold based on calibration
+    flash_expected = target.mean().values[0]
+    opt_threshold_calibration = np.quantile(pred_score, 1 - flash_expected)
+
+    if np.issubdtype(type(threshold), float):
+        used_threshold = threshold
+    elif threshold == "f1score":
+        used_threshold = opt_threshold_f1score
+    elif threshold == "calibration":
+        used_threshold = opt_threshold_calibration
+    else:
+        print(f"ERROR: Invalid threshold setting {threshold}. Fall back to F1 Score threshold.")
+        used_threshold = opt_threshold_f1score
+        
+    pred_class = np.where(pred_score > used_threshold, 1, 0)
+    pred_flash_expected = np.mean(pred_class)
+
+    conf_mat = scores.confusion_matrix(target, pred_class)
+
+    pred_has_two_classes = np.min(pred_class) < np.max(pred_class)
+    
+    class_rep = scores.classification_report(target, pred_class) if (target_has_two_classes and pred_has_two_classes) else "missing"
+
+    test_scores = {
+        "class_rep": class_rep,
+        "conf_mat": np.array2string(conf_mat),
+        "flash_expected": flash_expected,
+        "pred_flash_expected": pred_flash_expected,
+        "opt_threshold_calibration": opt_threshold_calibration,
+        "opt_threshold_f1score": opt_threshold_f1score,
+        "used_threshold": used_threshold,
+    }
+
+    conv_mat_2d = (len(conf_mat) > 1)
+
+    n = conf_mat.sum()
+    TP = conf_mat[1, 1] if conv_mat_2d else 0
+    TN = conf_mat[0, 0]
+    FP = conf_mat[0, 1] if conv_mat_2d else 0
+    FN = conf_mat[1, 0] if conv_mat_2d else 0
+
+    mcc = scores.matthews_corrcoef(target, pred_class)
+    test_scores["prc_auc"] = prc_auc
+    test_scores["roc_auc"] = roc_auc
+    test_scores["accuracy"] = (TP + TN) / n
+    test_scores["false_alarm_rate"] = FP / (FP + TP) if (FP + TP) > 0 else np.nan
+    test_scores["true_negative_rate"] = TN / (TN + FP) if (TN + FP) > 0 else np.nan
+    test_scores["true_positive_rate"] = TP / (FN + TP) if (FN + TP) > 0 else np.nan
+    test_scores["critical_success_index"] = TP / (TP + FN + FP) if (TP + FN + FP) else np.nan
+    test_scores["mcc"] = mcc
+
+    if print_output:
+        print('Area under PRC: {:.6f}'.format(prc_auc), flush=True)
+        print('Area under ROC: {:.6f}'.format(roc_auc), flush=True)
+        print(f'Optimal threshold F1score: \n{opt_threshold_f1score}', flush=True)
+        print(f'Optimal threshold calibration: \n{opt_threshold_calibration}', flush=True)
+        print(f'Used threshold: \n{used_threshold}', flush=True)
+        print(f'Classification report: \n{class_rep}', flush=True)
+        print(f'Confusion matrix report: \n{conf_mat}', flush=True)
+        print('Accuracy: {:.6f}'.format(test_scores["accuracy"]), flush=True)
+        print('False-alarm-rate: {:.6f}'.format(test_scores["false_alarm_rate"]), flush=True)
+        print('True-negative-rate: {:.6f}'.format(test_scores["true_negative_rate"]), flush=True)
+        print('True-positive-rate: {:.6f}'.format(test_scores["true_positive_rate"]), flush=True)
+        print('Critical-success-index: {:.6f}'.format(test_scores["critical_success_index"]), flush=True)
+        print('Matthews correlation coefficient: {:.6f}'.format(test_scores["mcc"]), flush=True)
+
+    return test_scores
+
+
 def test_one_epoch(model, device, test_dataloader_iter, steps_per_epoch, loss_criterion, target_mode, hook_name_list=[], threshold=None):
     model.eval()
     nr_data_rows = 0
@@ -221,60 +307,11 @@ def test_one_epoch(model, device, test_dataloader_iter, steps_per_epoch, loss_cr
     print('Validation Loss: {:.6f}'.format(test_loss), flush=True)
 
     return_df = pd.concat(return_dfs, ignore_index=True)
-
-    pred_score = return_df["output"]
-
+    
+    test_scores = {"loss" : test_loss}
+    
     if target_mode in {1, 3}:
-        roc_auc = scores.roc_auc_score(return_df["target"], pred_score, multi_class="ovr")
-
-        precisions, recalls, prc_thresholds = scores.precision_recall_curve(return_df["target"], pred_score)
-        prc_auc = scores.auc(recalls, precisions)
-
-        fscores = (2 * precisions * recalls) / (precisions + recalls)
-        opt_threshold = prc_thresholds[np.argmax(fscores)]
-        used_threshold = opt_threshold if threshold is None else threshold
-        pred_class = np.where(pred_score > used_threshold, 1, 0)
-
-        class_rep = scores.classification_report(return_df["target"], pred_class)
-        conf_mat = scores.confusion_matrix(return_df["target"], pred_class)
-
-        test_scores = {
-            "class_rep": class_rep,
-            "conf_mat": np.array2string(conf_mat),
-            "opt_threshold": opt_threshold,
-            "used_threshold": used_threshold,
-            "loss": test_loss,
-        }
-
-        n = conf_mat.sum()
-        TP = conf_mat[1, 1]
-        TN = conf_mat[0, 0]
-        FP = conf_mat[0, 1]
-        FN = conf_mat[1, 0]
-
-        mcc = scores.matthews_corrcoef(return_df["target"], pred_class)
-        test_scores["prc_auc"] = prc_auc
-        test_scores["roc_auc"] = roc_auc
-        test_scores["accuracy"] = (TP + TN) / n
-        test_scores["false_alarm_rate"] = FP / (FP + TP)
-        test_scores["true_negative_rate"] = TN / (TN + FP)
-        test_scores["true_positive_rate"] = TP / (FN + TP)
-        test_scores["critical_success_index"] = TP / (TP + FN + FP)
-        test_scores["mcc"] = mcc
-
-        print('Loss: {:.6f}'.format(test_loss), flush=True)
-        print('Area under PRC: {:.6f}'.format(prc_auc), flush=True)
-        print('Area under ROC: {:.6f}'.format(roc_auc), flush=True)
-        print(f'Optimal threshold: \n{opt_threshold}', flush=True)
-        print(f'Used threshold: \n{used_threshold}', flush=True)
-        print(f'Classification report: \n{class_rep}', flush=True)
-        print(f'Confusion matrix report: \n{conf_mat}', flush=True)
-        print('Accuracy: {:.6f}'.format(test_scores["accuracy"]), flush=True)
-        print('False-alarm-rate: {:.6f}'.format(test_scores["false_alarm_rate"]), flush=True)
-        print('True-negative-rate: {:.6f}'.format(test_scores["true_negative_rate"]), flush=True)
-        print('True-positive-rate: {:.6f}'.format(test_scores["true_positive_rate"]), flush=True)
-        print('Critical-success-index: {:.6f}'.format(test_scores["critical_success_index"]), flush=True)
-        print('Matthews correlation coefficient: {:.6f}'.format(test_scores["mcc"]), flush=True)
+        test_scores = calc_scores(return_df[["output"]], return_df[["target"]], threshold, print_output=True)
 
     return test_loss, return_df, test_scores
 
