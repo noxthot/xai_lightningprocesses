@@ -27,8 +27,8 @@ def main():
     with open(os.path.join(model_path, 'model_cfg.json'), 'r') as f:
         config_model = json.load(f)
 
-    with open(os.path.join(model_path, 'train_monitor.pickle'), 'rb') as f:
-        train_monitor = pickle.load(f)
+    with open(os.path.join(model_path, 'train_monitor.json'), 'rb') as f:
+        train_monitor = json.load(f)
 
     opt_threshold, best_epoch = utils.getOptThresholdFromVal(train_monitor, USE_EPOCH)
 
