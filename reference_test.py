@@ -6,7 +6,7 @@ import sklearn.metrics as scores
 
 THRTYPE = "calibration" # "fscore"
 
-DATA_PATH = "data/models/targetmode_1/2022_02_22__reference"
+DATA_PATH = "data/models/targetmode_1/2022_02_22__ALDIS_reference_gam"
 FILE = os.path.join(DATA_PATH, "test_predictions.parquet")
 FILE_VAL = os.path.join(DATA_PATH, "val_predictions.parquet")
 
