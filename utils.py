@@ -479,8 +479,7 @@ def getOptThresholdFromVal(train_monitor, use_epoch=None):
                 opt_threshold = scorebundle["opt_threshold"]
                 best_epoch = use_epoch
                 break
-
-        if scorebundle["mcc"] > max_mcc:
+        elif scorebundle["mcc"] > max_mcc:
             max_mcc = scorebundle["mcc"]
             opt_threshold = scorebundle["opt_threshold"]
             best_epoch = scorebundle["epoch"]
