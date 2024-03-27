@@ -107,7 +107,7 @@ for lon in LON_RNG:
         else:
             background = data_filt_lat
 
-        print(f"Compute shapley values for lon {lon}, lat {lat}")
+        print(f"Compute SHAP values for lon {lon}, lat {lat}")
         e = shap.DeepExplainer(model, background)
         base_value = e.expected_value
         print(f"Base value: {base_value}")
