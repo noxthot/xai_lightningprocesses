@@ -93,7 +93,7 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     
     dd_profiles_agg_q = dd_profiles_agg_q.sort_values(by=['variable', huecol, y_axis]).reset_index()
 
-    g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=PLOT_ASPECT, sharex=sharex, sharey=True, palette=palette) 
+    g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=PLOT_ASPECT, sharex=sharex, sharey=True, palette=palette)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qlow", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qhigh", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}median", lw=3, hue_order=hue_order, estimator=None, err_style=None)
