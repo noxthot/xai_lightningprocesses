@@ -1,5 +1,3 @@
-import datetime
-import itertools
 import pickle
 import random
 
