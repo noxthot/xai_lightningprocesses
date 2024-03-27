@@ -27,6 +27,7 @@ dependencies = [
     "ipywidgets>=8.1.1",
     "basemap>=1.3.9",
     "basemap-data-hires>=1.3.2",
+    "rioxarray>=0.15.1",
 ]
 requires-python = ">=3.10,<3.11"
 readme = "README.md"
