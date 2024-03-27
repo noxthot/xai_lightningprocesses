@@ -1,5 +1,4 @@
-How to obtain and pre-process the ERA5 model level data
-=======================================================
+# How to obtain and pre-process the ERA5 model level data
 
 ERA5 data on model level are an essential ingredient of the study.
 Here, we provide guidance through the most important steps to
@@ -11,8 +10,7 @@ cannot be made available to the public. However, ALDIS data are
 available on request from ALDIS <aldis@ove.at> -- fees may be charged.
 We think that this small downer is acceptable.
 
-CDS retrieval
--------------
+## CDS retrieval
 
 The Climate Data Store (CDS) is the operational service of the
 Copernicus Climate Change Service (C3S). Its purpose is to enable
@@ -33,8 +31,7 @@ as follows:
 (meteorology_verticallearning) $ python cds_retrival_ml.py -y 2022 -m 06
 ```
 
-From grib to netcdf format
---------------------------
+## From grib to netcdf format
 
 **grib** and **netcdf** are binary data formats common in the weather
 community and beyond. While the ERA5 model level data is only accessible
@@ -51,8 +48,7 @@ Here we need the `grib_to_netcdf` (https://confluence.ecmwf.int/display/ECC/grib
 
 The `etl.py` assumes to find the data in the **netcdf** format.
 
-Computation of vertical coordinates
------------------------------------
+## Computation of vertical coordinates
 
 In order to be able to interpret the results on physical
 vertical coordinates one can derive geopotential height
