@@ -100,6 +100,7 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     g.map(plt.fill_betweenx, y_axis, f'{colprefix}qlow', f'{colprefix}qhigh', alpha=0.4)
     g.set(ylim=ylims)
     g.add_legend(handles=legend_elements, loc='center right', bbox_to_anchor=(1, 0.5))
+    g.set_titles('{col_name}')
 
     formatManyProfilesPlots(g, target_var, y_axis, clusternr)
 
@@ -145,6 +146,7 @@ def plot_many_profiles_internal_mult(dd_profiles, target_var, y_axis, palette, p
     print("Plotting")
     g = sns.FacetGrid(dd_profiles_q[dd_profiles_q.unique_profile.isin(sampled_ids)], col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=PLOT_ASPECT, sharex=sharex, sharey=True, palette=palette)    
     g.map_dataframe(sns.lineplot, y=y_axis, x=coltarget, units='unique_profile', hue_order=hue_order, alpha=0.05, estimator=None)
+    g.set_titles('{col_name}')
     g.add_legend(handles=legend_elements, loc='center right', bbox_to_anchor=(1, 0.5))
 
     formatManyProfilesPlots(g, target_var, y_axis, clusternr)
