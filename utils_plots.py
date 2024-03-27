@@ -97,7 +97,7 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qlow", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qhigh", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
     g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}median", lw=3, hue_order=hue_order, estimator=None, err_style=None)
-    g.map(plt.fill_betweenx, y_axis, f'{colprefix}qlow', f'{colprefix}qhigh', alpha=0.4)
+    g.map(plt.fill_betweenx, y_axis, f'{colprefix}qlow', f'{colprefix}qhigh', alpha=0.25)
     g.set(ylim=ylims)
     g.add_legend(handles=legend_elements, loc='center right', bbox_to_anchor=(1, 0.5))
     g.set_titles('{col_name}')
