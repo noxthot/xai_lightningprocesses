@@ -7,6 +7,7 @@ import pyspark
 import sklearn.metrics as scores
 import torch.nn as nn
 import torch.nn.functional as F
+import xarray as xr
 
 from functools import partial
 from petastorm import TransformSpec
@@ -489,3 +490,12 @@ def getOptThresholdFromVal(train_monitor, use_epoch=None):
 
 def getVeryConfidentThreshold(used_threshold):
     return (1 + used_threshold) / 2
+
+
+def getElevationMap():
+    da = xr.open_dataset(os.path.join('.', 'data', 'netcdf_raw', 'tandem_topo.tif'), engine="rasterio")
+    da_coarse = da.coarsen(x=20, y=20, boundary='pad').max()
+    
+    df_elevation = da_coarse.to_dataframe().reset_index()[["x", "y", "band_data"]].rename({"x" : "longitude", "y" : "latitude", "band_data" : "elevation"}, axis=1)
+
+    return df_elevation["elevation"].apply(lambda x: x if x >= 0 else np.nan)
