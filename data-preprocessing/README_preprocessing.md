@@ -59,3 +59,7 @@ vertical coordinates one can derive geopotential height
 and pressure using `compute_vert_coords.py`. This is the
 script we used. As an alternative one can follow the
 instructions on https://confluence.ecmwf.int/display/CKB/ERA5%3A+compute+pressure+and+geopotential+on+model+levels%2C+geopotential+height+and+geometric+height.
+
+# How to get elevation data (optional)
+The elevation data, sourced from the TanDEM-X project in geotiff format, is utilized solely for depicting topography within background layers of select figures.
+This data is available for download from platforms such as [data.europe.eu](https://data.europa.eu/data/datasets/2846908f-74fa-4d64-95df-7bc14959ab42?locale=en) and is typically provided in tiled segments that require merging. The code for merging can be found in `merge_geotiffs.py`.
