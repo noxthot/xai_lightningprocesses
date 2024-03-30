@@ -2,7 +2,7 @@
 
 This is the source code accompanying the pre-print:
 
-Gregor Ehrensperger, Tobias Hell, Georg J. Mayr, and Thorsten Simon (2022). Identifying Lightning Processes in ERA5 Soundings with Deep Learning. Available on arXiv, 2210.11529. DOI: [10.48550/ARXIV.2210.11529](https://doi.org/10.48550/arXiv.2210.11529)
+Gregor Ehrensperger, Thorsten Simon, Georg J. Mayr, and Tobias Hell (2024). Identifying Lightning Processes in ERA5 Soundings with Deep Learning. Available on arXiv, 2210.11529. DOI: [10.48550/ARXIV.2210.11529](https://doi.org/10.48550/arXiv.2210.11529)
 
 ## Citing this software
 [Citation information](CITATION.cff)
@@ -63,14 +63,15 @@ The order of the following list defines the order in which the scripts should be
 - `test.py`: Evaluates the performance of the trained neural network on previously unseen test data. This file was used to compute the corresponding confusion matrix in Table 2.
 - `test_shap.py`: Computes the shapley values using the trained model on the test data.
 - `validation_scores.py`: Computes the classification threshold such that the diurnal cycle is least biased on the validation data.
-- `analyse_diurnal_cycles.py`: Uses the previously calculated classification threshold to generates plots that visualize how that threshold performs in reproducing the diurnal cycle on previously unseen test data. This file produces figure 2 of the paper.
-- `analyse_shap_and_features.ipynb`: Visualizes the shap and real values of the vertical profiles distinguishing between true positives, false positives, false negatives, aswell as providing some plots regarding cloud top and bottom height. This file was used to generate figures 3, 4, 5 and 7 of the paper.
-- `flash_case_study_final.ipynb`: Visualizes network classifications at a specific time on a map of austria. This file generates figure 6 of the paper.
+- `analyse_diurnal_cycles.py`: Uses the previously calculated classification threshold to generates plots that visualize how that threshold performs in reproducing the diurnal cycle on previously unseen test data. This file produces figure 1 of the paper.
+- `analyse_shap_and_features.ipynb`: Visualizes the shap and real values of the vertical profiles distinguishing between true positives, false positives, false negatives, aswell as providing some plots regarding cloud top and bottom height. This file was used to generate figures 2, 3, 4, 5 of the paper.
+- `analyse_shap_paper.ipynb`: Visualizes various more in-depth analysis of the distributions of the various groups (cloud, mass, wind), as well as some maps showing the frequencies. This file was used to generate figure 6 of the paper.
+- `flash_case_study_final.ipynb`: Visualizes network classifications at a specific time on a map of austria. This file generates figure 7 of the paper.
 
 ### Runnable Files (Reference model):
 - `reference_model.R`: Trains the reference model.
 - `reference_valpred.R`: Stores the model output on the validation data (used for calculating the classification threshold later on).
-- `reference_test.py`: Evaluates the trained reference model on previously unseen test data. This file was used to compute the corresponding confusion matrix in Table 2.
+- `reference_test.py`: Evaluates the trained reference model on previously unseen test data. This file was used to compute the corresponding confusion matrix in Table 3.
 
 ### Helper files
 - `ccc.py`: Defining some global constants.
