@@ -1,22 +1,16 @@
 # Identifying Lightning Processes in ERA5 Soundings with Deep Learning
 
-This is the source code accompanying the pre-print:
+This is the source code belonging to the paper of the same name.
 
-Gregor Ehrensperger, Thorsten Simon, Georg J. Mayr, and Tobias Hell (2024). Identifying Lightning Processes in ERA5 Soundings with Deep Learning. Available on arXiv, 2210.11529. DOI: [10.48550/ARXIV.2210.11529](https://doi.org/10.48550/arXiv.2210.11529)
+## Setup
+While the code should be platform-independent, it was mainly tested using Ubuntu 20.04 and 22.04.
 
-## Citing this software
-[Citation information](CITATION.cff)
-
-[![DOI](https://zenodo.org/badge/550170268.svg)](https://zenodo.org/badge/latestdoi/550170268)
-
-
-## Setup (Ubuntu)
 ### Paths
-Processed data is found in `Seafile/mlvapto/`. Simply create a symbolic link to that directory and name the link `data`. Raw data needs to be put into `data_raw_aut` (Austria) and `data_raw_eu` (EU).
+Processed data is found in `Seafile/mlvapto/`. Simply create a symbolic link (Ubuntu) or link (Windows) to that directory and name the link `data`. Raw data needs to be put into `data_raw_aut` (Austria) and `data_raw_eu` (EU).
 
 ### Python
 #### PDM
-Use `pdm` to install/sync all required modules:
+Use [`pdm`](https://pdm-project.org/) to install/sync all required modules:
 ```bash
 pdm sync
 ```
@@ -36,14 +30,18 @@ pdm add <PACKAGE_NAME>
 ```
 
 ### Java
-Pyspark needs a specific openjdk version:
+Pyspark needs a specific openjdk version (`openjdk-8`).
+
+To install in Ubuntu:
 ```
 sudo apt install openjdk-8-jdk
 ```
 
+For other systems, follow [this link](https://learn.microsoft.com/de-de/java/openjdk/download#openjdk-8).
+
 ### Hadoop
 Our code uses Spark which takes use of hadoop. The code also works without having a local hadoop installation, but it prints a warning.
-To install hadoop, simply download the latest stable hadoop version [here](https://downloads.apache.org/hadoop/common/stable/). Unpack
+To install hadoop under Ubuntu, simply download the latest stable hadoop version [here](https://downloads.apache.org/hadoop/common/stable/). Unpack
 the archive and add this line to your `~/.bashrc`:
 ```
 export HADOOP_HOME="/path/to/your/unpacked/hadoop-x.x.x"
@@ -63,15 +61,14 @@ The order of the following list defines the order in which the scripts should be
 - `test.py`: Evaluates the performance of the trained neural network on previously unseen test data. This file was used to compute the corresponding confusion matrix in Table 2.
 - `test_shap.py`: Computes the shapley values using the trained model on the test data.
 - `validation_scores.py`: Computes the classification threshold such that the diurnal cycle is least biased on the validation data.
-- `analyse_diurnal_cycles.py`: Uses the previously calculated classification threshold to generates plots that visualize how that threshold performs in reproducing the diurnal cycle on previously unseen test data. This file produces figure 1 of the paper.
-- `analyse_shap_and_features.ipynb`: Visualizes the shap and real values of the vertical profiles distinguishing between true positives, false positives, false negatives, aswell as providing some plots regarding cloud top and bottom height. This file was used to generate figures 2, 3, 4, 5 of the paper.
-- `analyse_shap_paper.ipynb`: Visualizes various more in-depth analysis of the distributions of the various groups (cloud, mass, wind), as well as some maps showing the frequencies. This file was used to generate figure 6 of the paper.
-- `flash_case_study_final.ipynb`: Visualizes network classifications at a specific time on a map of austria. This file generates figure 7 of the paper.
+- `analyse_diurnal_cycles.py`: Uses the previously calculated classification threshold to generates plots that visualize how that threshold performs in reproducing the diurnal cycle on previously unseen test data. This file produces figure 2 of the paper.
+- `analyse_shap_and_features.ipynb`: Visualizes the shap and real values of the vertical profiles distinguishing between true positives, false positives, false negatives, aswell as providing some plots regarding cloud top and bottom height. This file was used to generate figures 3, 4, 5 and 7 of the paper.
+- `flash_case_study_final.ipynb`: Visualizes network classifications at a specific time on a map of austria. This file generates figure 6 of the paper.
 
 ### Runnable Files (Reference model):
 - `reference_model.R`: Trains the reference model.
 - `reference_valpred.R`: Stores the model output on the validation data (used for calculating the classification threshold later on).
-- `reference_test.py`: Evaluates the trained reference model on previously unseen test data. This file was used to compute the corresponding confusion matrix in Table 3.
+- `reference_test.py`: Evaluates the trained reference model on previously unseen test data. This file was used to compute the corresponding confusion matrix in Table 2.
 
 ### Helper files
 - `ccc.py`: Defining some global constants.
