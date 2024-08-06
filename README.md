@@ -1,6 +1,6 @@
 # Identifying Lightning Processes in ERA5 Soundings with Deep Learning
 
-This is the source code belonging to the paper of the same name.
+This is the source code belonging to the paper of the same name [[1]](#1).
 
 ## Setup
 While the code should be platform-independent, it was mainly tested using Ubuntu 20.04 and 22.04.
@@ -74,3 +74,8 @@ The order of the following list defines the order in which the scripts should be
 - `ccc.py`: Defining some global constants.
 - `stats.py` and `stats_flash.py`: Used to calculate some of the constants defined in `ccc.py`.
 - `utils*.py`: Helper functions containing various routines.
+
+# References
+<a id="1">[1]</a>
+[1] Ehrensperger, G., Simon, T., Mayr, G. & Hell, T. (2024). Identifying Lightning Processes in ERA5 Soundings with Deep Learning. arXiv (https://arxiv.org/abs/2210.11529)
+>>>>>>> Stashed changes
