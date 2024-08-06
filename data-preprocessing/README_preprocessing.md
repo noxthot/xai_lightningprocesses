@@ -5,11 +5,6 @@ Here, we provide guidance through the most important steps to
 obtain and preprocess the ERA5 model level data up to the point
 where the data are in the right format for entering the `etl.py`.
 
-The ALDIS data, which are the second important source of data,
-cannot be made available to the public. However, ALDIS data are
-available on request from ALDIS <aldis@ove.at> -- fees may be charged.
-We think that this small downer is acceptable.
-
 ## CDS retrieval
 
 The Climate Data Store (CDS) is the operational service of the
@@ -46,7 +41,7 @@ Here we need the `grib_to_netcdf` (https://confluence.ecmwf.int/display/ECC/grib
 (meteorology_verticallearning) $ grib_to_netcdf -o ERA5_ml_2022-06.nc ERA5_ml_2022-06.grib
 ```
 
-The `etl.py` assumes to find the data in the **netcdf** format.
+The `etl.py` assumes to find the data in the **netcdf** format in `./data/netcdf_raw/era5` and `./data/netcdf_raw/era5sl`.
 
 ## Computation of vertical coordinates
 
@@ -56,6 +51,16 @@ and pressure using `compute_vert_coords.py`. This is the
 script we used. As an alternative one can follow the
 instructions on https://confluence.ecmwf.int/display/CKB/ERA5%3A+compute+pressure+and+geopotential+on+model+levels%2C+geopotential+height+and+geometric+height.
 
+# How to obtain ALDIS lightning location system
+
+The ALDIS data, which are the second important source of data, can be downloaded from [[1]](#1).
+
+The `etl.py` assumes to find the data in the **netcdf** format in `./data/netcdf_raw/flash`.
+
 # How to get elevation data (optional)
 The elevation data, sourced from the TanDEM-X project in geotiff format, is utilized solely for depicting topography within background layers of select figures.
 This data is available for download from platforms such as [data.europe.eu](https://data.europa.eu/data/datasets/2846908f-74fa-4d64-95df-7bc14959ab42?locale=en) and is typically provided in tiled segments that require merging. The code for merging can be found in `merge_geotiffs.py`.
+
+# References
+<a id="1">[1]</a>
+[1] Simon, T., Schulz, W., Ehrensperger, G., & Mayr, G. (2024). ALDIS cloud to ground lightning strike occurrence aggregated to spatiotemporal ERA5 cells (summer months 2010 to 2019) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.13164463
