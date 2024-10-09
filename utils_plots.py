@@ -94,10 +94,9 @@ def plot_many_profiles_internal_agg(dd_profiles_agg, target_var, y_axis, palette
     dd_profiles_agg_q = dd_profiles_agg_q.sort_values(by=['variable', huecol, y_axis]).reset_index()
 
     g = sns.FacetGrid(dd_profiles_agg_q, col='variable', hue=huecol, hue_order=hue_order, height=7, aspect=PLOT_ASPECT, sharex=sharex, sharey=True, palette=palette)
-    g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qlow", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
-    g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qhigh", hue_order=hue_order, alpha=0.1, estimator=None, err_style=None)
-    g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}median", lw=3, hue_order=hue_order, estimator=None, err_style=None)
-    g.map(plt.fill_betweenx, y_axis, f'{colprefix}qlow', f'{colprefix}qhigh', alpha=0.25)
+    g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qlow", estimator=None, err_style=None, hue_order=hue_order, linestyle='--')
+    g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}qhigh", estimator=None, err_style=None, hue_order=hue_order, linestyle='--')
+    g.map_dataframe(sns.lineplot, sort=False, y=y_axis, x=f"{colprefix}median", estimator=None, err_style=None, hue_order=hue_order, lw=3)
     g.set(ylim=ylims)
     g.add_legend(handles=legend_elements, loc='center right', bbox_to_anchor=(1, 0.5))
     g.set_titles('{col_name}')
@@ -181,7 +180,7 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
         mycases = df_many_cases.copy()
         mycases.drop([c for c in mycases.columns if c.startswith("geoh")], axis="columns", inplace=True)
 
-        idxcols = list(set(utils_shap.META_COLS_NOLVL) - set(["flash"]))
+        idxcols = list(set(utils_shap.META_COLS_NOLVL + ["cluster"]) - set(["flash"]))
 
         mycases_wl = pd.wide_to_long(mycases,
                                 stubnames=[f"{c}{infix}_lvl" for c in ccc.LVL_TRAIN_COLS for infix in {utils_shap.META_INFIX, utils_shap.SHAP_INFIX}],
@@ -197,7 +196,7 @@ def plot_many_profiles(df_many_cases, target_var, ptype='q90', y_axis='level', s
         mycases_wl.rename(columns=rencols, inplace=True)
         mycases_wl.rename(lambda c: "_".join(c.split("_")[::-1]), axis='columns', inplace=True)  # wide_to_long needs suffixes; so we rename columns "foo_bar" to "bar_foo"
        
-        dd_profiles = pd.wide_to_long(mycases_wl, [utils_shap.META_INFIX[1:], utils_shap.SHAP_INFIX[1:]], ccc.INDEX_COLS + ['level'], "variable", "_", r"\w+")
+        dd_profiles = pd.wide_to_long(mycases_wl, [utils_shap.META_INFIX[1:], utils_shap.SHAP_INFIX[1:]], ccc.INDEX_COLS + ['cluster', 'level'], "variable", "_", r"\w+")
 
         if write_cache:
             with open(cache_filepath, 'wb') as handle:
