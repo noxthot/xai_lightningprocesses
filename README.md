@@ -77,5 +77,4 @@ The order of the following list defines the order in which the scripts should be
 - `utils*.py`: Helper functions containing various routines.
 
 # References
-<a id="1">[1]</a>
-[1] Ehrensperger, G., Simon, T., Mayr, G. & Hell, T. (2024). Identifying Lightning Processes in ERA5 Soundings with Deep Learning. arXiv (https://arxiv.org/abs/2210.11529)
+<a id="1">[1]</a> Ehrensperger, G., Simon, T., Mayr, G. & Hell, T. (2024). Identifying Lightning Processes in ERA5 Soundings with Deep Learning. arXiv (https://arxiv.org/abs/2210.11529)
