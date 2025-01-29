@@ -1,5 +1,7 @@
 # Identifying Lightning Processes in ERA5 Soundings with Deep Learning
 
+[![DOI](https://zenodo.org/badge/550170268.svg)](https://zenodo.org/badge/latestdoi/550170268)
+
 This is the source code belonging to the paper of the same name [[1]](#1).
 
 ## Setup
